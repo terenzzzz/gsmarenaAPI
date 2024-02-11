@@ -35,10 +35,10 @@ const expressJWT = require('express-jwt')
 app.use(expressJWT({ secret: config.jwtSecretKey, algorithms: ['HS256'] }).unless({ path: [/^\/api\//] }))
 
 //登录模块
-// const userRouter = require('./router/user')
+const userRouter = require('./router/user')
 
 
-// app.use('/api', userRouter)
+app.use('/api', userRouter)
 // app.use('/my', userInfoRouter)
 
 
