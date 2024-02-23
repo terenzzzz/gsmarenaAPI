@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@escook/express-joi": "^1.1.1",
+    "axios": "^1.6.7",
     "bcryptjs": "2.4.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -18,6 +19,7 @@
     "jsonwebtoken": "8.5.1",
     "moment-timezone": "^0.5.43",
     "mysql": "^2.18.1",
-    "nodemon": "^3.0.3"
+    "nodemon": "^3.0.3",
+    "sqlite3": "^5.1.7"
   }
 }
