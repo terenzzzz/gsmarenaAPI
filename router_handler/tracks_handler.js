@@ -9,7 +9,7 @@ const sqliteDB = new sqlite3.Database('/Users/terenzzzz/Desktop/track_metadata.d
 // 从SQlite文件添加数据到Mysql
 exports.queryMetadata = (req, res) => {
     // logger.log("queryMetadata")
-    sqliteDB.all('SELECT * FROM songs', (err, rows) => {
+    sqliteDB.all('SELECT * FROM songs WHERE year = 2009', (err, rows) => {
         if (err) {
             console.error(err.message);
             return;
@@ -59,7 +59,7 @@ exports.queryNetEase = async (req, res) => {
       if (row.ne_song_id == null) {
         try {
           const response = await axios.get(`http://localhost:3000/search?keywords=${row.artist_name} ${row.title}&limit=1`);
-          if (response.data.result && response.data.result.songs){
+          if (response.data.result && response.data.result.songs && response.data.result.songs[0].album.name.length <= 225 ){
             let song = response.data.result.songs[0];
             // console.log(response.data.result);
             await new Promise((resolve, reject) => {
