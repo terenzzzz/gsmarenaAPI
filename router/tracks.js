@@ -11,5 +11,9 @@ router.get('/queryNetEase', tracksHandler.queryNetEase)
 router.get('/queryLyric', tracksHandler.queryLyric)
 router.get('/queryCover', tracksHandler.queryCover)
 router.get('/getTracks', tracksHandler.getTracks)
+router.get('/getTracksTags', tracksHandler.getTracksTags)
+router.get('/getArtistsTags', tracksHandler.getArtistsTags)
+router.get('/getArtistsCover', tracksHandler.getArtistsCover)
+
 //共享
 module.exports = router

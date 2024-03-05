@@ -19,6 +19,7 @@
     "jsonwebtoken": "8.5.1",
     "moment-timezone": "^0.5.43",
     "mysql": "^2.18.1",
+    "nodeman": "^1.1.2",
     "nodemon": "^3.0.3",
     "sqlite3": "^5.1.7"
   }

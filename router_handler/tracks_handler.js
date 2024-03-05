@@ -241,3 +241,209 @@ exports.getTracks = (req, res) => {
 
   })
 };
+
+// 请求网易云API，根据网易云歌手id获取对应歌手的封面
+exports.getArtistsCover = async (req, res) => {
+  try {
+    const sqlQuery = `select * from Artists`;
+    const result = await new Promise((resolve, reject) => {
+      db.query(sqlQuery, (err, result) => {
+        if (err) {
+          console.error('Error executing query:', err);
+          reject(err);
+          return;
+        }
+        resolve(result);
+      });
+    });
+
+    var count = 0
+    let totalCount = result.length
+    
+    for (const row of result) {
+      // console.log(row);
+      if(row.cover == null){
+        try{
+          const response = await axios.get(`http://localhost:3000/artist/detail?id=${row.ne_artist_id}`);
+          if (response.data.data){
+            var avatar = response.data.data.artist.avatar;
+            await new Promise((resolve, reject) => {
+              db.query(
+                'UPDATE Artists SET avatar = ? WHERE id = ?;', 
+                [avatar,row.id], 
+                (err, result) => {
+                  if (err) {
+                    console.error('Error updating row: ' + err.stack);
+                    reject(err);
+                    return;
+                  }
+                  count++
+                  console.log(`Updated artist avatar row with ID ${row.id}. (${count}/${totalCount})`);
+                  resolve();
+                }
+              );
+            });
+          }
+        } catch (error) {
+          if (error.response) {
+            console.error('Error making request:', error.response.data);
+          } else {
+            console.error('Error making request:', error);
+          }
+          console.log('Pausing for 5 minutes due to error...');
+          await sleep(3000000); // 暂停五分钟
+        }
+        await sleep(10000); // 暂停 
+      }else{
+        count++
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+// 获取Tracks
+exports.getTracks = (req, res) => {
+  const limit = req.query.limit || 10;
+  const sqlQuery = `select * from Tracks LIMIT ${limit}`;
+  db.query(sqlQuery, function (err, results) {
+    if (err) {
+        return res.send({ status: 1, message: err.message })
+    }
+
+    return res.send({ status: 200, message: '注册成功', data: results})
+
+  })
+};
+
+
+// 从last.fm获取Tracks Tags
+exports.getTracksTags = async (req, res) => {
+  try {
+    const sqlQuery = `select * from Tracks`;
+    const result = await new Promise((resolve, reject) => {
+      db.query(sqlQuery, (err, result) => {
+        if (err) {
+          console.error('Error executing query:', err);
+          reject(err);
+          return;
+        }
+        resolve(result);
+      });
+    });
+
+    var count = 0
+    let totalCount = result.length
+    
+    for (const row of result) {   
+      if(row.tags == null){
+        try{
+          const response = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=track.gettoptags&artist=${row.artist_name}&track=${encodeURIComponent(row.title)}&api_key=ee33544ab78d90ee804a994f3ac302b8&format=json`);
+          if (response.data.toptags){
+            var tags = response.data.toptags.tag.slice(0, 10); //限制最多十个标签
+            tags = tags.map(obj => {
+              // 使用解构赋值去掉 'url' 键值对
+              const { url, ...rest } = obj;
+              return rest;
+            });
+            await new Promise((resolve, reject) => {
+              db.query(
+                'UPDATE Tracks SET tags = ? WHERE id = ?;', 
+                [JSON.stringify(tags), row.id], 
+                (err, result) => {
+                  if (err) {
+                    console.error('Error updating row: ' + err.stack);
+                    reject(err);
+                    return;
+                  }
+                  count++
+                  console.log(`Updated tags row with ID ${row.id}. (${count}/${totalCount})`);
+                  resolve();
+                }
+              );
+            });
+          }
+        } catch (error) {
+          if (error.response) {
+            console.error('Error making request:', error.response.data);
+          } else {
+            console.error('Error making request:', error);
+          }
+          console.log('Pausing for 5 minutes due to error...');
+          await sleep(3000000); // 暂停五分钟
+        }
+        // await sleep(1000); // 暂停 
+      }else{
+        count++
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+// 从last.fm获取artist Tags
+exports.getArtistsTags = async (req, res) => {
+  try {
+    const sqlQuery = `select * from Artists`;
+    const result = await new Promise((resolve, reject) => {
+      db.query(sqlQuery, (err, result) => {
+        if (err) {
+          console.error('Error executing query:', err);
+          reject(err);
+          return;
+        }
+        resolve(result);
+      });
+    });
+
+    var count = 0
+    let totalCount = result.length
+    
+    for (const row of result) {   
+      if(row.tags == null){
+        try{
+          const response = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=${row.name}&api_key=ee33544ab78d90ee804a994f3ac302b8&format=json`);
+          if (response.data.toptags){
+            var tags = response.data.toptags.tag.slice(0, 10); //限制最多十个标签
+            tags = tags.map(obj => {
+              // 使用解构赋值去掉 'url' 键值对
+              const { url, ...rest } = obj;
+              return rest;
+            });
+            await new Promise((resolve, reject) => {
+              db.query(
+                'UPDATE Artists SET tags = ? WHERE id = ?;', 
+                [JSON.stringify(tags), row.id], 
+                (err, result) => {
+                  if (err) {
+                    console.error('Error updating row: ' + err.stack);
+                    reject(err);
+                    return;
+                  }
+                  count++
+                  console.log(`Updated artist tags row with ID ${row.id}. (${count}/${totalCount})`);
+                  resolve();
+                }
+              );
+            });
+          }
+        } catch (error) {
+          if (error.response) {
+            console.error('Error making request:', error.response.data);
+          } else {
+            console.error('Error making request:', error);
+          }
+          console.log('Pausing for 5 minutes due to error...');
+          await sleep(3000000); // 暂停五分钟
+        }
+        // await sleep(1000); // 暂停 
+      }else{
+        count++
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
