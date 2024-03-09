@@ -21,6 +21,7 @@
     "jsonwebtoken": "8.5.1",
     "moment-timezone": "^0.5.43",
     "mongodb": "^6.4.0",
+    "mongoose": "^8.2.1",
     "mysql": "^2.18.1",
     "nodeman": "^1.1.2",
     "nodemon": "^3.0.3",

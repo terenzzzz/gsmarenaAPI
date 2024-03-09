@@ -11,5 +11,7 @@ router.get('/getFromSQLite', modelHandlerer.getFromSQLite)
 router.get('/deviceDetail', modelHandlerer.deviceDetail)
 router.get('/moveMysqlToMongo', modelHandlerer.moveMysqlToMongo)
 
+router.get('/mongoQuery', modelHandlerer.mongoQuery)
+
 //共享
 module.exports = router

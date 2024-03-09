@@ -1,9 +1,11 @@
+const mongoose = require('mongoose');
 const sqlite3 = require('sqlite3');
 const { db, client_mongodb } = require('../db/index')
 const logger = require('../utils/logger');
 const axios = require('axios');
 
 const gsmarena = require('gsmarena-api');
+const { ObjectId } = require('mongodb');
 
 
 const modelDB = new sqlite3.Database('/Users/terenzzzz/Desktop/model.db');
@@ -22,6 +24,11 @@ async function connectToMongoDB() {
 }
 connectToMongoDB();
 
+exports.mongoQuery = async (req, res) => {
+  const mongo = client_mongodb.db('tsp').collection('models');
+  var result = await mongo.findOne({ _id: new ObjectId('65eacac78e5a81837baf9727') })
+  return res.send(result);
+};
 
 
 exports.moveMysqlToMongo = async (req, res) => {
